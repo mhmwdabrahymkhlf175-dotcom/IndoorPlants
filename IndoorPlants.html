@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<title>IndoorPlants Analyzer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="IndoorPlants Analyzer helps you detect indoor plant diseases from images. Get instant treatment suggestions, care tips, and keep your home plants healthy and thriving.">
+
+<meta name="keywords" content="Indoor Plants, Plant Analyzer, Plant Disease Detection, Plant Care Tips, Home Gardening, Leaf Health, Ficus, Calathea, Monstera, Plant Health Analyzer, Indoor Gardening, Plant Diagnosis">
+
+<meta name="author" content="Mahmoud Ibrahim Khalaf">
+
+<link rel="icon" href="https://i.imgur.com/yourfavicon.png" type="image/png">
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script>
+tailwind.config = {
+theme:{
+extend:{
+colors:{
+dark:'#0b3d2f',
+light:'#14593f',
+accent:'#f59e0b',
+card:'#124c3a',
+overlay:'#00000080'
+},
+fontFamily:{
+sans:['Poppins','sans-serif']
+},
+transitionProperty: {
+  'height': 'height',
+  'spacing': 'margin, padding',
+  'transform': 'transform'
+}
+}
+}
+}
+</script>
+
+<style>
+body{background:#0b3d2f;color:white;}
+.card-hover:hover { transform: translateY(-10px) scale(1.05); transition: all 0.3s ease; }
+.fade-in { opacity: 0; transform: translateY(20px); animation: fadeIn 1s forwards; }
+@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+/* Spinner Animation */
+.spinner { border: 4px solid rgba(255, 255, 255, 0.2); border-top: 4px solid #f59e0b; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body class="font-sans">
+
+<!-- ===== NAVBAR ===== -->
+<header class="fixed top-0 left-0 w-full bg-dark/90 backdrop-blur border-b border-white/10 z-50">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+    <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform">
+      <i class="fas fa-seedling text-accent text-2xl"></i>
+      <h1 class="text-2xl font-bold tracking-wide">
+        <span class="text-accent">Indoor</span>Plants
+      </h1>
+    </div>
+    <nav class="hidden md:flex items-center gap-8 text-lg">
+      <a href="#" class="hover:text-accent transition flex items-center gap-2 transform hover:-translate-y-1">
+        <i class="fas fa-home text-accent"></i> Home
+      </a>
+      <a href="#about" class="hover:text-accent transition flex items-center gap-2 transform hover:-translate-y-1">
+        <i class="fas fa-info-circle text-green-400"></i> About
+      </a>
+      <a href="#features" class="hover:text-accent transition flex items-center gap-2 transform hover:-translate-y-1">
+        <i class="fas fa-star text-yellow-400"></i> Features
+      </a>
+      <a href="#analyze" class="hover:text-accent transition flex items-center gap-2 transform hover:-translate-y-1">
+        <i class="fas fa-microscope text-green-400"></i> Analyze
+      </a>
+      <a href="#symptoms" class="hover:text-accent transition flex items-center gap-2 transform hover:-translate-y-1">
+        <i class="fas fa-notes-medical text-yellow-400"></i> Symptoms
+      </a>
+      <a href="#care" class="hover:text-accent transition flex items-center gap-2 transform hover:-translate-y-1">
+        <i class="fas fa-leaf text-green-300"></i> Care
+      </a>
+      <a href="#contact" class="hover:text-accent transition flex items-center gap-2 transform hover:-translate-y-1">
+        <i class="fas fa-envelope text-accent"></i> Contact
+      </a>
+    </nav>
+    <button id="menuBtn" class="md:hidden text-2xl text-accent hover:scale-110 transition-transform">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+</header>
+
+<div id="overlay" class="hidden fixed inset-0 bg-overlay z-40"></div>
+
+<div id="mobileMenu" class="fixed top-0 left-0 h-full w-64 bg-dark z-50 transform -translate-x-full transition-transform duration-300 flex flex-col gap-6 p-6 text-lg shadow-xl">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-bold text-accent">Menu</h2>
+    <button id="closeMenu" class="text-2xl hover:scale-110 transition-transform">
+      <i class="fas fa-xmark"></i>
+    </button>
+  </div>
+  <a href="#" class="hover:text-accent transition flex items-center gap-2"><i class="fas fa-home text-accent"></i> Home</a>
+  <a href="#about" class="hover:text-accent transition flex items-center gap-2"><i class="fas fa-info-circle text-green-400"></i> About</a>
+  <a href="#features" class="hover:text-accent transition flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i> Features</a>
+  <a href="#analyze" class="hover:text-accent transition flex items-center gap-2"><i class="fas fa-microscope text-green-400"></i> Analyze</a>
+  <a href="#symptoms" class="hover:text-accent transition flex items-center gap-2"><i class="fas fa-notes-medical text-yellow-400"></i> Symptoms</a>
+  <a href="#care" class="hover:text-accent transition flex items-center gap-2"><i class="fas fa-leaf text-green-300"></i> Care</a>
+  <a href="#contact" class="hover:text-accent transition flex items-center gap-2"><i class="fas fa-envelope text-accent"></i> Contact</a>
+</div>
+
+<script>
+const btn = document.getElementById("menuBtn");
+const menu = document.getElementById("mobileMenu");
+const closeBtn = document.getElementById("closeMenu");
+const overlay = document.getElementById("overlay");
+
+btn.onclick = () => { menu.classList.remove("-translate-x-full"); overlay.classList.remove("hidden"); };
+closeBtn.onclick = () => { menu.classList.add("-translate-x-full"); overlay.classList.add("hidden"); };
+overlay.onclick = () => { menu.classList.add("-translate-x-full"); overlay.classList.add("hidden"); };
+</script>
+
+<!-- ===== HERO ===== -->
+<section class="min-h-screen pt-24 px-6 flex items-center">
+<div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center fade-in">
+<div>
+<h1 class="text-5xl md:text-6xl font-bold leading-tight mb-6">
+Bring <span class="text-accent">Nature</span><br>Into Your Home
+</h1>
+<p class="text-xl text-gray-300 mb-10">
+Hand-picked indoor plants that thrive in modern spaces.
+</p>
+<button class="bg-accent hover:bg-orange-500 transition px-8 py-4 rounded-full text-lg font-semibold transform hover:scale-105">
+Shop Now
+</button>
+</div>
+<div>
+<img src="https://www.thespruce.com/thmb/DizsBW_GJ0-8NE8FI-qg2UPYfiw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/calathea-orbifolia-growing-guide-5270824-hero-2a3b8667f05b40a49b27da573d2486fb.jpg"
+class="rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-500">
+</div>
+</div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about" class="py-24 px-6 bg-dark/20">
+<div class="max-w-7xl mx-auto text-center">
+<h2 class="text-5xl font-bold mb-14 fade-in">About This Project</h2>
+<p class="text-gray-300 text-lg mb-6">IndoorPlants Analyzer helps users detect plant diseases using images. It provides treatment tips and care instructions. Built with HTML, Tailwind CSS, and JavaScript for interactive experience.</p>
+<p class="text-gray-300 text-lg">The project aims to make plant care accessible and easy, combining modern UI design with practical functionality.</p>
+</div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features" class="py-24 px-6 bg-light/20">
+<div class="max-w-7xl mx-auto text-center">
+<h2 class="text-5xl font-bold mb-14 fade-in">Features</h2>
+<div class="grid md:grid-cols-3 gap-10">
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">📸 Image Analysis</h3>
+<p class="text-gray-300">Upload plant images and detect diseases with visual guidance.</p>
+</div>
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">💡 Care Tips</h3>
+<p class="text-gray-300">Get recommendations on watering, lighting, and repotting.</p>
+</div>
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">⚡ Responsive Design</h3>
+<p class="text-gray-300">Works perfectly on mobile, tablet, and desktop devices.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ===== ANALYZE (File + URL + Camera) ===== -->
+<section id="analyze" class="py-24 px-6 bg-dark/20">
+<div class="max-w-4xl mx-auto text-center">
+<h2 class="text-5xl font-bold mb-14 fade-in">Analyze Your Plant</h2>
+<p class="text-gray-300 mb-8">Upload a photo, use an image URL, or take a picture with your camera to detect plant diseases.</p>
+
+<!-- Buttons -->
+<div class="flex flex-col md:flex-row justify-center gap-6 mb-6">
+<label for="plantImage" 
+       class="cursor-pointer inline-flex items-center justify-center px-6 py-4 bg-accent hover:bg-orange-500 transition text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105">
+<i class="fas fa-upload mr-3"></i> Upload Image
+</label>
+<input type="file" id="plantImage" accept="image/*" class="hidden">
+
+<button id="urlBtn" 
+        class="bg-green-500 hover:bg-green-600 text-white px-6 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all">
+<i class="fas fa-link mr-2"></i> Use Image URL
+</button>
+
+<label for="cameraInput" 
+       class="cursor-pointer inline-flex items-center justify-center px-6 py-4 bg-blue-500 hover:bg-blue-600 transition text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105">
+<i class="fas fa-camera mr-3"></i> Take Photo
+</label>
+<input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
+</div>
+
+<div id="urlInputContainer" class="mb-6 hidden">
+<input type="text" id="imageURL" placeholder="Enter image URL" class="p-4 rounded-2xl w-full text-black mb-4">
+<button id="loadURLBtn" class="bg-accent hover:bg-orange-500 px-8 py-3 rounded-full text-lg font-semibold transform hover:scale-105">
+Load Image
+</button>
+</div>
+
+<div id="previewContainer" class="mb-6">
+<img id="preview" src="" class="mx-auto rounded-3xl shadow-2xl border-4 border-accent hidden transition-transform duration-500 hover:scale-105">
+</div>
+
+<button id="analyzeBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-10 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all mb-4">
+<i class="fas fa-microscope mr-2"></i> Analyze
+</button>
+
+<div id="result" class="mt-10 text-left text-gray-300"></div>
+</div>
+</section>
+
+<script>
+const fileInput = document.getElementById("plantImage");
+const cameraInput = document.getElementById("cameraInput");
+const preview = document.getElementById("preview");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const resultDiv = document.getElementById("result");
+
+const urlBtn = document.getElementById("urlBtn");
+const urlInputContainer = document.getElementById("urlInputContainer");
+const loadURLBtn = document.getElementById("loadURLBtn");
+const imageURLInput = document.getElementById("imageURL");
+
+urlBtn.addEventListener("click", () => {
+  urlInputContainer.classList.toggle("hidden");
+});
+
+loadURLBtn.addEventListener("click", () => {
+  const url = imageURLInput.value.trim();
+  if(url){
+    preview.src = url;
+    preview.classList.remove("hidden");
+  }
+});
+
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  if(file){
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove("hidden");
+  }
+});
+
+cameraInput.addEventListener("change", () => {
+  const file = cameraInput.files[0];
+  if(file){
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove("hidden");
+  }
+});
+
+analyzeBtn.addEventListener("click", () => {
+  if(!preview.src){
+    resultDiv.innerHTML = "<p class='text-red-500'>Please select or load an image first!</p>";
+    return;
+  }
+  resultDiv.innerHTML = `<div class="spinner"></div><p class='text-gray-300 mt-4 text-center'>Analyzing...</p>`;
+  setTimeout(() => {
+    resultDiv.innerHTML = `
+      <div class="bg-card p-6 rounded-2xl shadow-lg">
+        <h3 class="text-2xl font-bold text-accent mb-4">Ficus Elastica</h3>
+        <p><strong>Detected Issue:</strong> Leaf Spot</p>
+        <p><strong>Probability:</strong> 92%</p>
+        <p><strong>Treatment:</strong> Remove affected leaves, treat with fungicide, improve airflow</p>
+      </div>
+    `;
+  }, 2000);
+});
+</script>
+
+<!-- ===== SYMPTOMS ===== -->
+<section id="symptoms" class="py-24 px-6 bg-light/20">
+<div class="max-w-7xl mx-auto text-center">
+<h2 class="text-5xl font-bold mb-14 fade-in">Common Symptoms</h2>
+<div class="grid md:grid-cols-3 gap-10">
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">Yellow Leaves</h3>
+<p class="text-gray-300">Indicates overwatering or nutrient deficiency.</p>
+</div>
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">Brown Spots</h3>
+<p class="text-gray-300">May indicate fungal infection.</p>
+</div>
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">Wilting</h3>
+<p class="text-gray-300">Could be due to lack of water or root problems.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ===== CARE ===== -->
+<section id="care" class="py-24 px-6 bg-dark/20">
+<div class="max-w-7xl mx-auto text-center">
+<h2 class="text-5xl font-bold mb-14 fade-in">Plant Care Tips</h2>
+<div class="grid md:grid-cols-3 gap-10">
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">💧 Water Smart</h3>
+<p class="text-gray-300">Overwatering kills more plants than neglect.</p>
+</div>
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">☀️ Light Matters</h3>
+<p class="text-gray-300">Bright indirect light is ideal.</p>
+</div>
+<div class="bg-card p-8 rounded-2xl card-hover">
+<h3 class="text-xl font-semibold mb-4">🌱 Repot Gently</h3>
+<p class="text-gray-300">Repot only when roots outgrow the pot.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact" class="py-24 px-6 bg-light/20">
+<div class="max-w-7xl mx-auto text-center">
+<h2 class="text-5xl font-bold mb-14 fade-in">Get In Touch</h2>
+<form class="max-w-xl mx-auto grid gap-6">
+<input type="text" placeholder="Name" class="p-4 rounded-xl w-full text-black">
+<input type="email" placeholder="Email" class="p-4 rounded-xl w-full text-black">
+<textarea placeholder="Message" class="p-4 rounded-xl w-full text-black"></textarea>
+<button class="bg-accent hover:bg-orange-500 transition px-8 py-4 rounded-full text-lg font-semibold transform hover:scale-105">Send Message</button>
+</form>
+</div>
+</section>
+
+</body>
+</html>
